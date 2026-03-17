@@ -1,27 +1,46 @@
-import google.generativeai as genai
-from telegram import Update
-from telegram.ext import ContextTypes
+# To run this code you need to install the following dependencies:
+# pip install google-genai
 
-# Nastavení Gemini (toto by mělo být v config.py)
-genai.configure(api_key="TVUJ_GEMINI_API_KEY")
-model = genai.GenerativeModel('gemini-pro')
+import os
+from google import genai
+from google.genai import types
 
-# Paměť pro konverzace (jednoduchá verze)
-chat_sessions = {}
 
-async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
-    user_text = update.message.text
+def generate():
+    client = genai.Client(
+        api_key=os.environ.get("AIzaSyAeQopyzKYZh23GeToimyczCHtmrIp8CYI"),
+    )
 
-    # Pokud uživatel ještě nemá chat session, vytvoříme ji
-    if user_id not in chat_sessions:
-        chat_sessions[user_id] = model.start_chat(history=[])
+    model = "gemini-2.5-flash"
+    contents = [
+        types.Content(
+            role="user",
+            parts=[
+                types.Part.from_text(text="""AHOJ"""),
+            ],
+        ),
+    ]
+    tools = [
+        types.Tool(url_context=types.UrlContext()),
+        types.Tool(googleSearch=types.GoogleSearch(
+        )),
+    ]
+    generate_content_config = types.GenerateContentConfig(
+        thinking_config=types.ThinkingConfig(
+            thinking_budget=0,
+        ),
+        media_resolution="MEDIA_RESOLUTION_MEDIUM",
+        tools=tools,
+    )
 
-    try:
-        # Pošleme zprávu Gemini
-        response = chat_sessions[user_id].send_message(user_text)
-        
-        # Odpovíme uživateli na Telegramu
-        await update.message.reply_text(response.text)
-    except Exception as e:
-        await update.message.reply_text(f"Chyba: {str(e)}")
+    for chunk in client.models.generate_content_stream(
+        model=model,
+        contents=contents,
+        config=generate_content_config,
+    ):
+        print(chunk.text, end="")
+
+if __name__ == "__main__":
+    generate()
+
+
