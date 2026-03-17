@@ -6,7 +6,7 @@ from telegram.ext import ApplicationBuilder, ContextTypes, MessageHandler, filte
 
 # 1. NASTAVENÍ KLÍČŮ (vlož své klíče sem nebo do .env)
 TELEGRAM_TOKEN = '8438893458:AAEFi-8amn5L99aDZ8KSO1SmNJ2mG-Nw5_A'
-GEMINI_API_KEY = 'AIzaSyAeQopyzKYZh23GeToimyczCHtmrIp8CYI'
+GEMINI_API_KEY = 'AIzaSyANRbIX15ah9TTPG-n8NRSN4orfh1ux75k'
 
 # Konfigurace Gemini
 genai.configure(api_key=GEMINI_API_KEY)
